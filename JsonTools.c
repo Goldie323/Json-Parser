@@ -3,6 +3,7 @@
 
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 #include "JsonConsts.h"
 
 size_t RoundUpToPowerOfTwo(size_t x) {
@@ -15,9 +16,26 @@ size_t RoundUpToPowerOfTwo(size_t x) {
     return x;
 }
 
-bool JsonStringCmp(const JsonString *a, const JsonString *b) {
-    if (a->size != b->size) return false;
-    return (memcmp(a->value, b->value, a->size) == 0);
+bool JsonStringCmp(const void *a, const void *b) {
+    const JsonString *strA = (const JsonString *)a;
+    const JsonString *strB = (const JsonString *)b;
+    if (strA->size != strB->size) return false;
+    return (memcmp(strA->value, strB->value, strA->size) == 0);
+}
+
+char *JsonMinimizeString(const char *str) {
+    size_t len = strlen(str);
+    char *minimized = (char *)malloc(len + 1);
+    if (!minimized) return NULL;
+
+    size_t j = 0;
+    for (size_t i = 0; i < len; i++) {
+        if (str[i] != ' ' && str[i] != '\n' && str[i] != '\t' && str[i] != '\r') {
+            minimized[j++] = str[i];
+        }
+    }
+    minimized[j] = '\0';
+    return minimized;
 }
 
 #endif

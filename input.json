@@ -1,0 +1,16 @@
+{
+  "name": "Nathaniel",
+  "age": 1824.234,
+  "isDeveloper": true,
+  "spouse": null,
+  "skills": [
+    "C",
+    "C++",
+    "Lua",
+    "Brainfuck"
+  ],
+  "address": {
+    "city": "New York",
+    "zip": 10001
+  }
+}

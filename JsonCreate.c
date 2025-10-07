@@ -8,17 +8,22 @@
 #include "JsonTools.c"
 
 JsonData *CreateJsonString(const char *value, size_t length, bool isKey) {
-    JsonString *JsonString = malloc(sizeof(JsonString));
-    JsonString->base.type = JSON_STRING;
-    JsonString->size = length;
+    JsonString *str = malloc(sizeof(JsonString));
+    if (!str) return NULL;
+    str->base.type = JSON_STRING;
+    str->size = length;
     if (isKey) {
-        JsonString->capacity = length;
+        str->capacity = length;
     } else {
-        JsonString->capacity = RoundUpToPowerOfTwo(length);
+        str->capacity = RoundUpToPowerOfTwo(length);
     }
-    JsonString->value = malloc(JsonString->capacity);
-    memcpy(JsonString->value, value, JsonString->size);
-    return (JsonData *)JsonString;
+    str->value = malloc(str->capacity);
+    if (!str->value) {
+        free(str);
+        return NULL;
+    }
+    memcpy(str->value, value, str->size);
+    return (JsonData *)str;
 }
 
 JsonData *CreateJsonStringNullTerminated(const char *value, bool isKey) {
@@ -26,97 +31,129 @@ JsonData *CreateJsonStringNullTerminated(const char *value, bool isKey) {
 }
 
 JsonData *CreateJsonNumber(double value) {
-    JsonNumber *JsonNumber = malloc(sizeof(JsonNumber));
-    JsonNumber->base.type = JSON_NUMBER;
-    JsonNumber->value = value;
-    return (JsonData *)JsonNumber;
+    JsonNumber *num = malloc(sizeof(JsonNumber));
+    if (!num) return NULL;
+    num->base.type = JSON_NUMBER;
+    num->value = value;
+    return (JsonData *)num;
 }
 
 JsonData *CreateJsonBoolean(bool value) {
-    JsonBoolean *JsonBoolean = malloc(sizeof(JsonBoolean));
-    JsonBoolean->base.type = JSON_BOOLEAN;
-    JsonBoolean->value = value;
-    return (JsonData *)JsonBoolean;
+    JsonBoolean *b = malloc(sizeof(JsonBoolean));
+    if (!b) return NULL;
+    b->base.type = JSON_BOOLEAN;
+    b->value = value;
+    return (JsonData *)b;
 }
 
 JsonData *CreateJsonNull() {
-    JsonData *JsonNull = malloc(sizeof(JsonData));
-    JsonNull->type = JSON_NULL;
-    return JsonNull;
+    JsonData *n = malloc(sizeof(JsonData));
+    if (!n) return NULL;
+    n->type = JSON_NULL;
+    return n;
 }
 
 JsonData *CreateJsonObject() {
-    JsonObject *JsonObject = malloc(sizeof(JsonObject));
-    JsonObject->base.type = JSON_OBJECT;
-    JsonObject->size = 0;
-    JsonObject->capacity = 4;
-    JsonObject->items = malloc(JsonObject->capacity * sizeof(JsonPair *));
-    return (JsonData *)JsonObject;
+    JsonObject *obj = malloc(sizeof(JsonObject));
+    if (!obj) return NULL;
+    obj->base.type = JSON_OBJECT;
+    obj->size = 0;
+    obj->capacity = 4;
+    obj->items = malloc(obj->capacity * sizeof(JsonPair *));
+    if (!obj->items) {
+        free(obj);
+        return NULL;
+    }
+    return (JsonData *)obj;
 }
 
-bool DoesKeyExistInJsonObject(JsonObject *obj, JsonString *key) {
-    for (size_t i = 0; i < obj->size; i++) {
-        if (JsonStringCmp(obj->items[i]->key, key)) {
+bool DoesKeyExistInJsonObject(void *obj, void *key) {
+    JsonObject *jsonObj = (JsonObject *)obj;
+    JsonString *jsonKey = (JsonString *)key;
+    if (!jsonObj || jsonObj->base.type != JSON_OBJECT) return false;
+    if (!jsonKey || jsonKey->base.type != JSON_STRING) return false;
+    for (size_t i = 0; i < jsonObj->size; i++) {
+        if (JsonStringCmp(jsonObj->items[i]->key, jsonKey)) {
             return true;
         }
     }
     return false;
 }
 
-bool AddToJsonObject(JsonObject *obj, JsonString *key, JsonData *value) {
-    if (DoesKeyExistInJsonObject(obj, key)) {
+bool AddToJsonObject(void *obj, void *key, void *value) {
+    JsonObject *jsonObj = (JsonObject *)obj;
+    JsonString *jsonKey = (JsonString *)key;
+    JsonData *jsonValue = (JsonData *)value;
+    if (!jsonObj || jsonObj->base.type != JSON_OBJECT) return false;
+    if (!jsonKey || jsonKey->base.type != JSON_STRING) return false;
+    if (!jsonValue) return false;
+
+    if (DoesKeyExistInJsonObject(jsonObj, jsonKey)) {
         return false;
     }
 
-    if (obj->size >= obj->capacity) {
-        obj->capacity *= 2;
-        JsonPair **newItems = realloc(obj->items, obj->capacity * sizeof(JsonPair *));
+    if (jsonObj->size >= jsonObj->capacity) {
+        jsonObj->capacity *= 2;
+        JsonPair **newItems = realloc(jsonObj->items, jsonObj->capacity * sizeof(JsonPair *));
         if (!newItems) return false;
-        obj->items = newItems;
+        jsonObj->items = newItems;
     }
 
     JsonPair *pair = malloc(sizeof(JsonPair));
-    pair->key = key;
-    pair->value = value;
-    obj->items[obj->size++] = pair;
+    pair->key = jsonKey;
+    pair->value = jsonValue;
+    jsonObj->items[jsonObj->size++] = pair;
     return true;
 }
 
-bool GetValueFromJsonObject(JsonObject *obj, JsonString *key, JsonData **outValue) {
-    for (size_t i = 0; i < obj->size; i++) {
-        if (JsonStringCmp(obj->items[i]->key, key)) {
-            *outValue = obj->items[i]->value;
-            return true;
+JsonData *GetValueFromJsonObject(void *obj, void *key) {
+    JsonObject *jsonObj = (JsonObject *)obj;
+    JsonString *jsonKey = (JsonString *)key;
+    if (!jsonObj || jsonObj->base.type != JSON_OBJECT) return NULL;
+    if (!jsonKey || jsonKey->base.type != JSON_STRING) return NULL;
+    for (size_t i = 0; i < jsonObj->size; i++) {
+        if (JsonStringCmp(jsonObj->items[i]->key, jsonKey)) {
+            return jsonObj->items[i]->value;
         }
     }
-    return false;
+    return NULL;
 }
 
 JsonData *CreateJsonArray() {
-    JsonArray *JsonArray = malloc(sizeof(JsonArray));
-    JsonArray->base.type = JSON_ARRAY;
-    JsonArray->size = 0;
-    JsonArray->capacity = 4;
-    JsonArray->items = malloc(JsonArray->capacity * sizeof(JsonData *));
-    return (JsonData *)JsonArray;
+    JsonArray *arr = malloc(sizeof(JsonArray));
+    if (!arr) return NULL;
+    arr->base.type = JSON_ARRAY;
+    arr->size = 0;
+    arr->capacity = 4;
+    arr->items = malloc(arr->capacity * sizeof(JsonData *));
+    if (!arr->items) {
+        free(arr);
+        return NULL;
+    }
+    return (JsonData *)arr;
 }
 
-bool AddToJsonArray(JsonArray *arr, JsonData *value) {
-    if (arr->size >= arr->capacity) {
-        arr->capacity *= 2;
-        JsonData **newItems = realloc(arr->items, arr->capacity * sizeof(JsonData *));
+bool AddToJsonArray(void *arr, void *value) {
+    JsonArray *jsonArr = (JsonArray *)arr;
+    JsonData *jsonValue = (JsonData *)value;
+    if (!jsonArr || jsonArr->base.type != JSON_ARRAY) return false;
+    if (!jsonValue) return false;
+    if (jsonArr->size >= jsonArr->capacity) {
+        jsonArr->capacity *= 2;
+        JsonData **newItems = realloc(jsonArr->items, jsonArr->capacity * sizeof(JsonData *));
         if (!newItems) return false;
-        arr->items = newItems;
+        jsonArr->items = newItems;
     }
 
-    arr->items[arr->size++] = value;
+    jsonArr->items[jsonArr->size++] = jsonValue;
     return true;
 }
 
-bool GetValueFromJsonArray(JsonArray *arr, size_t index, JsonData **outValue) {
-    if (index >= arr->size) return false;
-    *outValue = arr->items[index];
-    return true;
+JsonData *GetValueFromJsonArray(void *arr, size_t index) {
+    JsonArray *jsonArr = (JsonArray *)arr;
+    if (!jsonArr || jsonArr->base.type != JSON_ARRAY) return NULL;
+    if (index >= jsonArr->size) return NULL;
+    return jsonArr->items[index];
 }
 
 #endif

@@ -1,5 +1,5 @@
-#ifndef JSONFREE_C
-#define JSONFREE_C
+#ifndef JSONPRINT_C
+#define JSONPRINT_C
 
 #include <stdlib.h>
 #include <string.h>
@@ -71,6 +71,7 @@ static void init_json_escape_table() {
 }
 
 char* PrintJsonString(JsonString *str) {
+    if (!str) return NULL;
     init_json_escape_table();
     size_t newLen = 2;
     for (size_t i = 0; i < str->size; i++) {
@@ -103,6 +104,7 @@ char* PrintJsonString(JsonString *str) {
 }
 
 char* PrintJsonNumber(JsonNumber *num) {
+    if (!num) return NULL;
     size_t len = snprintf(NULL, 0, "%g", num->value);
     if (len < 0) return NULL;
 
@@ -114,6 +116,7 @@ char* PrintJsonNumber(JsonNumber *num) {
 }
 
 char *PrintJsonBoolean(JsonBoolean *boolean) {
+    if (!boolean) return NULL;
     return boolean->value ? dupstr("true") : dupstr("false");
 }
 
@@ -122,6 +125,8 @@ char *PrintJsonNull() {
 }
 
 char *PrintJsonPair(JsonPair *pair) {
+    if (!pair) return NULL;
+    if (!pair->key || !pair->value) return NULL;
     char *keyStr = PrintJsonString(pair->key);
     if (!keyStr) return NULL;
 
@@ -152,6 +157,7 @@ char *PrintJsonPair(JsonPair *pair) {
 }
 
 char *PrintJsonObject(JsonObject *obj) {
+    if (!obj) return NULL;
     if (obj->size == 0) {
         char *emptyObj = dupstr("{}");
         if (!emptyObj) return NULL;
@@ -199,6 +205,7 @@ char *PrintJsonObject(JsonObject *obj) {
 }
 
 char *PrintJsonArray(JsonArray *array) {
+    if (!array) return NULL;
     if (array->size == 0) {
         char *emptyArr = dupstr("[]");
         if (!emptyArr) return NULL;
@@ -246,6 +253,7 @@ char *PrintJsonArray(JsonArray *array) {
 }
 
 char *PrintJsonData(JsonData *data) {
+    if (!data) return NULL;
     switch (data->type) {
         case JSON_STRING:
             return PrintJsonString((JsonString*)data);
@@ -276,6 +284,8 @@ static char *make_indent(int indent) {
 }
 
 char* PPrintJsonPair(JsonPair *pair, int indent, int nextIndent) {
+    if (!pair) return NULL;
+    if (!pair->key || !pair->value) return NULL;
     char *keyStr = PrintJsonString(pair->key);
     char *valueStr = PPrintJsonData(pair->value, nextIndent);
     char *indentStr = make_indent(indent);
@@ -297,6 +307,7 @@ char* PPrintJsonPair(JsonPair *pair, int indent, int nextIndent) {
 }
 
 char* PPrintJsonObject(JsonObject *obj, int indent) {
+    if (!obj) return NULL;
     if (obj->size == 0) return dupstr("{}");
 
     int nextIndent = indent + 2;
@@ -312,7 +323,7 @@ char* PPrintJsonObject(JsonObject *obj, int indent) {
     char *indentStr = make_indent(indent);
     totalLen += strlen(indentStr) + 3;
 
-    char *buf = malloc(totalLen);
+    char *buf = malloc(totalLen + 1);
     if (!buf) {
         for (size_t i = 0; i < obj->size; i++) free(pairStrs[i]);
         free(pairStrs);
@@ -338,6 +349,7 @@ char* PPrintJsonObject(JsonObject *obj, int indent) {
 }
 
 char* PPrintJsonArray(JsonArray *array, int indent) {
+    if (!array) return NULL;
     if (array->size == 0) return dupstr("[]");
 
     int nextIndent = indent + 2;
@@ -366,7 +378,7 @@ char* PPrintJsonArray(JsonArray *array, int indent) {
     char *indentStr = make_indent(indent);
     totalLen += strlen(indentStr) + 3;
 
-    char *buf = malloc(totalLen);
+    char *buf = malloc(totalLen + 1);
     if (!buf) {
         for (size_t i = 0; i < array->size; i++) free(itemStrs[i]);
         free(itemStrs);
@@ -392,6 +404,7 @@ char* PPrintJsonArray(JsonArray *array, int indent) {
 }
 
 char* PPrintJsonData(JsonData *data, int indent) {
+    if (!data) return NULL;
     switch (data->type) {
         case JSON_STRING:
             return PrintJsonString((JsonString*)data);
