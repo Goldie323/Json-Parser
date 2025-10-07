@@ -1,9 +1,9 @@
-#ifndef TOOLS_C
-#define TOOLS_C
+#ifndef JSONTOOLS_C
+#define JSONTOOLS_C
 
 #include <stddef.h>
 #include <stdbool.h>
-#include "Consts.h"
+#include "JsonConsts.h"
 
 size_t RoundUpToPowerOfTwo(size_t x) {
     if (x == 0) return 1;

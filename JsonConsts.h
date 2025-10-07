@@ -1,5 +1,5 @@
-#ifndef CONSTS_H
-#define CONSTS_H
+#ifndef JSONCONSTS_H
+#define JSONCONSTS_H
 
 #include <stdint.h>
 #include <stdbool.h>

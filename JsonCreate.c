@@ -1,11 +1,11 @@
-#ifndef CREATE_C
-#define CREATE_C
+#ifndef JSONCREATE_C
+#define JSONCREATE_C
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "Consts.h"
-#include "Tools.c"
+#include "JsonConsts.h"
+#include "JsonTools.c"
 
 JsonData *CreateJsonString(const char *value, size_t length, bool isKey) {
     JsonString *JsonString = malloc(sizeof(JsonString));

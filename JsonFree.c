@@ -1,8 +1,8 @@
-#ifndef FREE_C
-#define FREE_C
+#ifndef JSONFREE_C
+#define JSONFREE_C
 
 #include <stdlib.h>
-#include "Consts.h"
+#include "JsonConsts.h"
 
 void FreeJsonData(JsonData *data);
 
