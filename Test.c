@@ -9,7 +9,7 @@ JsonObject *root = (JsonObject *)CreateJsonObject();
 AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("name", true), CreateJsonStringNullTerminated("Nathaniel", false));
 
 // Add a number
-AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("age", true), CreateJsonNumber(1824.234));
+AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("age", true), CreateJsonNumber(1824.23));
 
 // Add a boolean
 AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("isDeveloper", true), CreateJsonBoolean(true));
