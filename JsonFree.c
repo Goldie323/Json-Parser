@@ -87,4 +87,9 @@ void FreeJsonData(JsonData *data) {
     }
 }
 
+void FreeJson(void *data) {
+    if (!data) return;
+    FreeJsonData((JsonData *)data);
+}
+
 #endif

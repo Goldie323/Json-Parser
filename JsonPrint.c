@@ -22,10 +22,9 @@ static inline char* dupstr(const char* s) {
 }
 #endif
 
-// Compact Print Functions
 char* PrintJsonData(JsonData *data);
 
-static void init_json_escape_table() {
+void init_json_escape_table() {
     if (json_escape_initialized) return;
     for (int i = 0; i < 256; i++) json_escape_table[i] = NULL;
 
@@ -272,7 +271,11 @@ char *PrintJsonData(JsonData *data) {
     }
 }
 
-// Pretty Print Functions
+char *PrintJson(void *data){
+    if (!data) return NULL;
+    return PrintJsonData((JsonData *)data);
+}
+
 char *PPrintJsonData(JsonData *data, int indent);
 
 static char *make_indent(int indent) {
@@ -421,6 +424,11 @@ char* PPrintJsonData(JsonData *data, int indent) {
         default:
             return NULL;
     }
+}
+
+char *PPrintJson(void *data) {
+    if (!data) return NULL;
+    return PPrintJsonData((JsonData *)data, 0);
 }
 
 #endif

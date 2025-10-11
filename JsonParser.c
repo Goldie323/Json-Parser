@@ -29,7 +29,7 @@ JsonData *ParseJsonNumber(const char *num) {
         part1[len_part1] = '\0';
         part2 = expPos + 1;
     } else {
-        part1 = num;
+        part1 = (char *)num;
     }
 
     JsonNumber *ParsedNumber = malloc(sizeof(JsonNumber));
@@ -82,6 +82,10 @@ JsonData *ParseJsonArray(const char *arrStr) {
 
 JsonData *ParseJsonData(const char *arrStr) {
     //this really needs to handle A LOT to work, wanna do this later
+}
+
+JsonData *ParseJson(const char *jsonStr) {
+    //this needs to handle a lot and so I don't want to do it yet.
 }
 
 #endif

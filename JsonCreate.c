@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "JsonConsts.h"
-#include "JsonTools.c"
+#include "JsonTools.h"
 
 JsonData *CreateJsonString(const char *value, size_t length, bool isKey) {
     JsonString *str = malloc(sizeof(JsonString));
@@ -154,6 +154,51 @@ JsonData *GetValueFromJsonArray(void *arr, size_t index) {
     if (!jsonArr || jsonArr->base.type != JSON_ARRAY) return NULL;
     if (index >= jsonArr->size) return NULL;
     return jsonArr->items[index];
+}
+
+size_t GetJsonArraySize(void *arr) {
+    JsonArray *jsonArr = (JsonArray *)arr;
+    if (!jsonArr || jsonArr->base.type != JSON_ARRAY) return 0;
+    return jsonArr->size;
+}
+
+char *GetStringFromJson(void *data) {
+    if (!data) return NULL;
+    JsonString *str = (JsonString *)data;
+    if (str->base.type != JSON_STRING) return NULL;
+    char *result = malloc(str->size + 1);
+    if (!result) return NULL;
+    memcpy(result, str->value, str->size);
+    result[str->size] = '\0';
+    return result;
+}
+
+double GetNumberFromJson(void *data, bool *success) {
+    if (!data) {
+        if (success) *success = false;
+        return 0.0;
+    }
+    JsonNumber *num = (JsonNumber *)data;
+    if (num->base.type != JSON_NUMBER) {
+        if (success) *success = false;
+        return 0.0;
+    }
+    if (success) *success = true;
+    return num->value;
+}
+
+bool GetBooleanFromJson(void *data, bool *success) {
+    if (!data) {
+        if (success) *success = false;
+        return false;
+    }
+    JsonBoolean *b = (JsonBoolean *)data;
+    if (b->base.type != JSON_BOOLEAN) {
+        if (success) *success = false;
+        return false;
+    }
+    if (success) *success = true;
+    return b->value;
 }
 
 #endif

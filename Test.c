@@ -1,4 +1,4 @@
-#include "Json.c"
+#include "Json.h"
 #include <stdio.h>
 
 int main() {
@@ -57,7 +57,7 @@ AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("address", tr
     printf("Minimized JSON:%s\n", minimized);
     // do nothing with the inputted json because there's nothing in the parser yet.
 
-    char *jsonString = PPrintJsonData((JsonData *)root, 0);
+    char *jsonString = PPrintJson(root);
     
     FILE *fp;
     fp = fopen("./output.json", "w"); // Open "output.json" for writing
@@ -74,7 +74,7 @@ AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("address", tr
     }
 
     /* Free the JSON structure we created */
-    FreeJsonData((JsonData *)root);
+    FreeJson(root);
 
     return 0;
 }

@@ -4,7 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
-
+#include <stdlib.h>
 #include "JsonConsts.h"
 
 size_t RoundUpToPowerOfTwo(size_t x) {
@@ -37,6 +37,42 @@ char *JsonMinimizeString(const char *str) {
     }
     minimized[j] = '\0';
     return minimized;
+}
+
+bool isString(void *data) {
+    if (!data) return false;
+    JsonData *dataPtr = (JsonData *)data;
+    return (dataPtr->type == JSON_STRING);
+}
+
+bool isNumber(void *data) {
+    if (!data) return false;
+    JsonData *dataPtr = (JsonData *)data;
+    return (dataPtr->type == JSON_NUMBER);
+}
+
+bool isBoolean(void *data) {
+    if (!data) return false;
+    JsonData *dataPtr = (JsonData *)data;
+    return (dataPtr->type == JSON_BOOLEAN);
+}
+
+bool isNull(void *data) {
+    if (!data) return false;
+    JsonData *dataPtr = (JsonData *)data;
+    return (dataPtr->type == JSON_NULL);
+}
+
+bool isObject(void *data) {
+    if (!data) return false;
+    JsonData *dataPtr = (JsonData *)data;
+    return (dataPtr->type == JSON_OBJECT);
+}
+
+bool isArray(void *data) {
+    if (!data) return false;
+    JsonData *dataPtr = (JsonData *)data;
+    return (dataPtr->type == JSON_ARRAY);
 }
 
 #endif

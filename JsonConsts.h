@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
-#include <stdlib.h>
+#include <stddef.h>
 
 enum {
     JSON_STRING,
@@ -15,7 +15,7 @@ enum {
 };
 
 typedef struct {
-    __uint8_t type;
+    uint8_t type;
 } JsonData;
 
 typedef struct {
