@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
+
 #include "JsonConsts.h"
 
 size_t RoundUpToPowerOfTwo(size_t x) {

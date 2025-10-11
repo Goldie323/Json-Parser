@@ -54,7 +54,7 @@ AddToJsonObject(root, (JsonString *)CreateJsonStringNullTerminated("address", tr
         perror("Failed to minimize JSON string");
         return 1;
     }
-    printf("Minimized JSON:\n%s\n", minimized);
+    printf("Minimized JSON:%s\n", minimized);
     // do nothing with the inputted json because there's nothing in the parser yet.
 
     char *jsonString = PPrintJsonData((JsonData *)root, 0);
