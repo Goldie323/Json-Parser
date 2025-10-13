@@ -1,7 +1,6 @@
 #ifndef JSON_H
 #define JSON_H
 
-#include "JsonConsts.h"
 #include "JsonCreate.h"
 #include "JsonFree.h"
 #include "JsonParser.h"
